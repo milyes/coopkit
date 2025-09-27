@@ -1,30 +1,13 @@
-# 🧠 Cookpit IA – Capsule Santé Éthique
+🧠 CoopKit IA – Capsule JSON Launcher
 
-Cockpit modulaire pour le suivi santé Parkinson classe 2, validé SYSTEMEOSIA.
+Cockpit modulaire IA22 pour la génération de capsules JSON, HTML et PDF.  
+Validé SYSTEMEOSIA, avec QR activables et intégration CLI.
 
-## 🔧 Fonctions activées
-- Génération de capsules JSON, HTML, PDF
-- QR activables pour diffusion terrain
-- Intégration CLI et cockpit IA
-- Synchronisation GitHub Pages + Calendly
-
-## 🚀 Installation
-```bash
-git clone https://github.com/milyes/cookpit.git
-cd cookpit
-pip install .
-
-coopkit json        # Génère capsule JSON
-coopkit html        # Génère capsule HTML
-python3 generate_qr.py -link "<URL>"  # Génère QR
-
----
-
-## 🔜 Prochaines extensions possibles
-
-- 📄 Générateur PDF cockpit avec QR intégré
-- 🖼️ Image capsule SYSTEMEOSIA pour diffusion LinkedIn
-- 🔐 Signature cryptographique et badge de certification
+🔧 Fonctions activées :
+- Générateur JSON autonome
+- Export HTML / PDF
+- QR activables pour diffusion
+- Signature GEMINI CORE 2.6 PRO- 🔐 Signature cryptographique et badge de certification
 - 📊 Tableau cockpit avec état des modules et diffusion
 
 ---
