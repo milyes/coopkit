@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Notes</title>
+    <style>
+        /* --- CSS : Le style de l'application --- */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --background-color: #ecf0f1;
+            --container-color: #ffffff;
+            --font-color: #34495e;
+            --border-color: #bdc3c7;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--background-color);
+            color: var(--font-color);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- Barre latérale (Liste des notes) --- */
+        .sidebar {
+            width: 300px;
+            background-color: var(--container-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.2em;
+            color: var(--secondary-color);
+        }
+
+        #add-note-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #add-note-btn:hover {
+            background-color: #2980b9;
+        }
+
+        #notes-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        #notes-list .note-item {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        #notes-list .note-item:hover {
+            background-color: #f7f7f7;
+        }
+
+        #notes-list .note-item.selected {
+            background-color: #e8f4fd;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .note-item-title {
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .note-item-date {
+            font-size: 0.8em;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+
+        /* --- Zone d'édition principale --- */
+        .main-editor {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        #note-title-input, #note-content-input {
+            border: 1px solid transparent;
+            padding: 10px;
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #note-title-input {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #note-content-input {
+            flex-grow: 1;
+            resize: none;
+            font-size: 1.1em;
+            line-height: 1.6;
+            font-family: inherit;
+        }
+
+        #note-title-input:focus, #note-content-input:focus {
+            outline: none;
+            border-color: var(--border-color);
+            border-radius: 5px;
+        }
+        
+        .main-editor-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        #delete-note-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Caché par défaut */
+        }
+        #delete-note-btn:hover {
+            background-color: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- --- HTML : La structure de l'application --- -->
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Mes Notes</h2>
+                <button id="add-note-btn">+</button>
+            </div>
+            <ul id="notes-list">
+                <!-- La liste des notes sera générée ici par JavaScript -->
+            </ul>
+        </div>
+        <div class="main-editor">
+             <div class="main-editor-header">
+                <button id="delete-note-btn">Supprimer</button>
+            </div>
+            <input type="text" id="note-title-input" placeholder="Titre de la note...">
+            <textarea id="note-content-input" placeholder="Commencez à écrire..."></textarea>
+        </div>
+    </div>
+
+    <script>
+        // --- JavaScript : La logique de l'application ---
+
+        // Récupération des éléments du DOM
+        const notesListElement = document.getElementById('notes-list');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const titleInput = document.getElementById('note-title-input');
+        const contentInput = document.getElementById('note-content-input');
+        const deleteNoteBtn = document.getElementById('delete-note-btn');
+
+        let notes = [];
+        let selectedNoteId = null;
+
+        // Classe pour gérer les opérations sur les notes
+        class NotesAPI {
+            static getAllNotes() {
+                const savedNotes = localStorage.getItem('notes-app-data');
+                return savedNotes ? JSON.parse(savedNotes) : [];
+            }
+
+            static saveNotes(notesToSave) {
+                localStorage.setItem('notes-app-data', JSON.stringify(notesToSave));
+            }
+        }
+
+        // Classe pour gérer l'interface utilisateur
+        class AppUI {
+            static displayNotes() {
+                notes = NotesAPI.getAllNotes();
+                notesListElement.innerHTML = '';
+                
+                notes.forEach(note => {
+                    const li = document.createElement('li');
+                    li.classList.add('note-item');
+                    li.dataset.noteId = note.id;
+                    if (note.id === selectedNoteId) {
+                        li.classList.add('selected');
+                    }
+                    
+                    li.innerHTML = `
+                        <div class="note-item-title">${note.title || 'Nouvelle note'}</div>
+                        <div class="note-item-date">${new Date(note.updated).toLocaleString('fr-FR')}</div>
+                    `;
+                    notesListElement.appendChild(li);
+                });
+                
+                this.handleNoteSelection();
+            }
+
+            static showSelectedNote() {
+                if (notes.length === 0) {
+                    titleInput.value = '';
+                    contentInput.value = '';
+                    deleteNoteBtn.style.display = 'none';
+                    return;
+                }
+                
+                const note = notes.find(n => n.id === selectedNoteId);
+                if (note) {
+                    titleInput.value = note.title;
+                    contentInput.value = note.content;
+                    deleteNoteBtn.style.display = 'block';
+                } else {
+                    // Si aucune note n'est sélectionnée, sélectionner la première
+                    selectedNoteId = notes[0]?.id || null;
+                    this.displayNotes();
+                    this.showSelectedNote();
+                }
+            }
+
+            static handleNoteSelection() {
+                const noteItems = document.querySelectorAll('.note-item');
+                noteItems.forEach(item => {
+                    item.addEventListener('click', () => {
+                        selectedNoteId = Number(item.dataset.noteId);
+                        this.displayNotes();
+                        this.showSelectedNote();
+                    });
+                });
+            }
+            
+            static clearInputs() {
+                titleInput.value = '';
+                contentInput.value = '';
+            }
+        }
+
+        // --- Logique principale ---
+
+        // Ajouter une nouvelle note
+        addNoteBtn.addEventListener('click', () => {
+            const newNote = {
+                id: Date.now(),
+                title: '',
+                content: '',
+                updated: new Date().toISOString()
+            };
+            notes.unshift(newNote); // Ajoute la nouvelle note au début
+            selectedNoteId = newNote.id;
+            NotesAPI.saveNotes(notes);
+            AppUI.displayNotes();
+            AppUI.showSelectedNote();
+            titleInput.focus();
+        });
+
+        // Supprimer une note
+        deleteNoteBtn.addEventListener('click', () => {
+            notes = notes.filter(note => note.id !== selectedNoteId);
+            selectedNoteId = notes[0]?.id || null;
+            NotesAPI.saveNotes(notes);
+            AppUI.displayNotes();
+            AppUI.showSelectedNote();
+        });
+
+        // Mettre à jour une note lors de la saisie
+        const updateNote = () => {
+            const noteToUpdate = notes.find(note => note.id === selectedNoteId);
+
+            if (noteToUpdate) {
+                noteToUpdate.title = titleInput.value;
+                noteToUpdate.content = contentInput.value;
+                noteToUpdate.updated = new Date().toISOString();
+
+                // Tri pour mettre la note modifiée en haut
+                notes.sort((a, b) => new Date(b.updated) - new Date(a.updated));
+                NotesAPI.saveNotes(notes);
+                AppUI.displayNotes();
+            }
+        };
+
+        titleInput.addEventListener('input', updateNote);
+        contentInput.addEventListener('input', updateNote);
+
+        // Initialisation de l'application
+        AppUI.displayNotes();
+        AppUI.showSelectedNote();
+
+    </script>
+</body>
+</html>
