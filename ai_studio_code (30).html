@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application de Tâches</title>
+    <style>
+        /* --- CSS : Le style de l'application --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .app-container {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        #task-input {
+            flex-grow: 1;
+            padding: 12px;
+            border: 2px solid #dfe6e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        #task-input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        #add-task-btn {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #add-task-btn:hover {
+            background-color: #0056b3;
+        }
+
+        #task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            text-align: left;
+        }
+
+        #task-list li {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+            cursor: pointer;
+        }
+        
+        #task-list li.completed {
+            text-decoration: line-through;
+            color: #888;
+            background-color: #e9ecef;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- --- HTML : La structure de l'application --- -->
+    <div class="app-container">
+        <h1>Ma Liste de Tâches</h1>
+        <div class="input-area">
+            <input type="text" id="task-input" placeholder="Ajouter une nouvelle tâche...">
+            <button id="add-task-btn">Ajouter</button>
+        </div>
+        <ul id="task-list">
+            <!-- Les tâches seront ajoutées ici par JavaScript -->
+        </ul>
+    </div>
+
+    <script>
+        // --- JavaScript : La logique de l'application ---
+
+        // 1. Récupérer les éléments HTML dont nous avons besoin
+        const taskInput = document.getElementById('task-input');
+        const addTaskBtn = document.getElementById('add-task-btn');
+        const taskList = document.getElementById('task-list');
+
+        // 2. Fonction pour ajouter une tâche
+        function addTask() {
+            const taskText = taskInput.value.trim(); // .trim() enlève les espaces vides au début et à la fin
+
+            // Si le champ n'est pas vide
+            if (taskText !== '') {
+                // Créer un nouvel élément de liste (<li>)
+                const li = document.createElement('li');
+                
+                // Créer le texte de la tâche
+                const taskSpan = document.createElement('span');
+                taskSpan.textContent = taskText;
+                
+                // Créer le bouton de suppression
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'X';
+                deleteBtn.className = 'delete-btn';
+
+                // Ajouter le texte et le bouton à l'élément de liste
+                li.appendChild(taskSpan);
+                li.appendChild(deleteBtn);
+
+                // Ajouter le nouvel élément de liste à la liste de tâches
+                taskList.appendChild(li);
+
+                // Vider le champ de saisie
+                taskInput.value = '';
+                taskInput.focus();
+
+                // Ajouter les écouteurs d'événements pour la nouvelle tâche
+                addEventListenersToTask(li);
+            }
+        }
+
+        // 3. Fonction pour gérer les clics sur une tâche (marquer/supprimer)
+        function addEventListenersToTask(li) {
+            const deleteBtn = li.querySelector('.delete-btn');
+            const taskSpan = li.querySelector('span');
+
+            // Marquer comme complétée en cliquant sur le texte
+            taskSpan.addEventListener('click', function() {
+                li.classList.toggle('completed');
+            });
+
+            // Supprimer la tâche en cliquant sur le bouton 'X'
+            deleteBtn.addEventListener('click', function() {
+                taskList.removeChild(li);
+            });
+        }
+
+        // 4. Écouter l'événement "click" sur le bouton "Ajouter"
+        addTaskBtn.addEventListener('click', addTask);
+
+        // 5. Permettre d'ajouter une tâche en appuyant sur la touche "Entrée"
+        taskInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        });
+
+    </script>
+</body>
+</html>
