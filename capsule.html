@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🚀 SYSTEEMOSIA – JSON Launcher IA</title>
+  <style>
+    body {
+      background: #0b0c10;
+      color: #e0f7fa;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 1.5em;
+      text-align: center;
+    }
+
+    h1, h2 {
+      color: #00ffd5;
+      font-weight: 700;
+      margin-bottom: 0.5em;
+    }
+
+    form {
+      background: #1a1a1d;
+      border-radius: 12px;
+      padding: 1.5em;
+      margin-bottom: 2em;
+      box-shadow: 0 0 12px #00ffd555;
+    }
+
+    input, select, textarea {
+      width: 85%;
+      padding: 0.6em;
+      margin: 0.4em 0;
+      background: #101114;
+      color: #e0f7fa;
+      border: 1px solid #00ffd5;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    button {
+      background-color: #00ffd5;
+      color: #000;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6em 1.2em;
+      margin-top: 0.5em;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00c4a7;
+    }
+
+    iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+      margin-top: 2em;
+    }
+
+    .section-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #00ffd5;
+      margin-top: 2em;
+    }
+
+    footer {
+      color: #777;
+      font-size: 0.8em;
+      margin-top: 2em;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>🚀 SYSTEEMOSIA – JSON Launcher IA</h1>
+
+  <form id="jsonForm">
+    <input type="text" id="moduleName" placeholder="Nom du module (Ex: PARA-TRACE)" required>
+    <input type="text" id="signalLevel" placeholder="Niveau du signal (Ex: 9.6)" required>
+    <textarea id="description" placeholder="Décris le signal, le contexte, l’interprétation..." rows="3"></textarea>
+    <button type="submit">Générer Capsule JSON</button>
+  </form>
+
+  <pre id="output" style="text-align:left; background:#0d0d0f; color:#00ffd5; padding:1em; border-radius:8px; display:none;"></pre>
+
+  <h2 class="section-title">🔍 Recherche IA – Billets Montréal ↔ Oran</h2>
+  <form id="flightForm">
+    <label for="departureDate">Date de départ</label><br>
+    <input type="date" id="departureDate" required><br>
+
+    <label for="returnDate">Date de retour</label><br>
+    <input type="date" id="returnDate" required><br>
+
+    <button type="submit">Trouver les meilleurs prix</button>
+  </form>
+
+  <iframe id="flightResults" src="" style="display:none;"></iframe>
+
+  <footer>
+    © 2025 NetSecurePro | IA22CONSTALLATIONSOURCE_v1 | CoopKit_IA-D  
+  </footer>
+
+  <script>
+    // --- Génération du JSON Launcher ---
+    document.getElementById('jsonForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const data = {
+        module: document.getElementById('moduleName').value,
+        signal_level: document.getElementById('signalLevel').value,
+        description: document.getElementById('description').value,
+        timestamp: new Date().toISOString()
+      };
+      const output = document.getElementById('output');
+      output.textContent = JSON.stringify(data, null, 2);
+      output.style.display = 'block';
+    });
+
+    // --- Recherche de billets IA ---
+    document.getElementById('flightForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const depart = document.getElementById('departureDate').value;
+      const retour = document.getElementById('returnDate').value;
+
+      const iframe = document.getElementById('flightResults');
+      const query = `https://www.google.com/travel/flights?q=flights+from+Montreal+to+Oran+on+${depart}+return+${retour}`;
+      iframe.src = query;
+      iframe.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
